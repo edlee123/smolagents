@@ -90,7 +90,7 @@ BROWSER_CONFIG = {
 os.makedirs(f"./{BROWSER_CONFIG['downloads_folder']}", exist_ok=True)
 
 
-def create_agent(model_id="o1", api_base=None, api_key=None, search_provider="serper"):
+def create_agent(model_id="o1", api_base=None, api_key=None, search_provider="serpapi"):
     model_params = {
         "model_id": model_id,
         "custom_role_conversions": custom_role_conversions,

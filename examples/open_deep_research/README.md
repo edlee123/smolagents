@@ -69,8 +69,10 @@ Replace `"YOUR_API_BASE_URL"` with the base URL of your API endpoint, and `"YOUR
 
 ### Using a different search provider
 
-You can choose between the "serper" (default) and "serpapi" search providers using the `--search-provider` argument. Make sure to set the corresponding environment variable (`SERPER_API_KEY` or `SERPAPI_API_KEY`) accordingly.
+You can choose between the "serpapi" (default) and  "serper" search providers using the `--search-provider` argument. Make sure to set the corresponding environment variable (`SERPAPI_API_KEY` or `SERPER_API_KEY`) accordingly.
 
 ```bash
-python run.py --search-provider "serper" "Your question here!"  # Uses SERPER_API_KEY (default)
-python run.py --search-provider "serpapi" "Your question here!" # Uses SERPAPI_API_KEY
+python run.py --search-provider "serpapi" "Your question here!" # Uses SERP_API_KEY
+
+python run.py --search-provider "serper" "Your question here!"  # Uses SERPER_API_KEY
+```
