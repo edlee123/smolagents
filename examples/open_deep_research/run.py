@@ -20,10 +20,14 @@ from smolagents import (
     CodeAgent,
     GoogleSearchTool,
     # HfApiModel,
-    LiteLLMModel,
+    OpenAIServerModel,
+    # LiteLLMModel,
     ToolCallingAgent,
 )
 
+import logging
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
 AUTHORIZED_IMPORTS = [
     "requests",
@@ -63,6 +67,9 @@ def parse_args():
         "question", type=str, help="for example: 'How many studio albums did Mercedes Sosa release before 2007?'"
     )
     parser.add_argument("--model-id", type=str, default="o1")
+    parser.add_argument("--api-base", type=str, default=None)
+    parser.add_argument("--api-key", type=str, default=None)
+    parser.add_argument("--search-provider", type=str, default="serper")
     return parser.parse_args()
 
 
@@ -83,7 +90,7 @@ BROWSER_CONFIG = {
 os.makedirs(f"./{BROWSER_CONFIG['downloads_folder']}", exist_ok=True)
 
 
-def create_agent(model_id="o1"):
+def create_agent(model_id="o1", api_base=None, api_key=None, search_provider="serper"):
     model_params = {
         "model_id": model_id,
         "custom_role_conversions": custom_role_conversions,
@@ -91,12 +98,19 @@ def create_agent(model_id="o1"):
     }
     if model_id == "o1":
         model_params["reasoning_effort"] = "high"
-    model = LiteLLMModel(**model_params)
+    if api_base:
+        model_params["api_base"] = api_base + "/v1/"
+    if api_key:
+        model_params["api_key"] = api_key
+
+
+    model = OpenAIServerModel(**model_params)
 
     text_limit = 100000
     browser = SimpleTextBrowser(**BROWSER_CONFIG)
+
     WEB_TOOLS = [
-        GoogleSearchTool(provider="serper"),
+        GoogleSearchTool(provider=search_provider),
         VisitTool(browser),
         PageUpTool(browser),
         PageDownTool(browser),
@@ -118,7 +132,7 @@ def create_agent(model_id="o1"):
     And don't hesitate to provide him with a complex search task, like finding a difference between two webpages.
     Your request must be a real sentence, not a google search! Like "Find me this information (...)" rather than a few keywords.
     """,
-        provide_run_summary=True,
+        provide_run_summary=True
     )
     text_webbrowser_agent.prompt_templates["managed_agent"]["task"] += """You can navigate to .txt online files.
     If a non-html page is in another format, especially .pdf or a Youtube video, use tool 'inspect_file_as_text' to inspect it.
@@ -131,7 +145,7 @@ def create_agent(model_id="o1"):
         verbosity_level=2,
         additional_authorized_imports=AUTHORIZED_IMPORTS,
         planning_interval=4,
-        managed_agents=[text_webbrowser_agent],
+        managed_agents=[text_webbrowser_agent]
     )
 
     return manager_agent
@@ -139,9 +153,8 @@ def create_agent(model_id="o1"):
 
 def main():
     args = parse_args()
-
-    agent = create_agent(model_id=args.model_id)
-
+    logger.info(f"Running with args: {args}")
+    agent = create_agent(model_id=args.model_id, api_base=args.api_base, api_key=args.api_key, search_provider=args.search_provider)
     answer = agent.run(args.question)
 
     print(f"Got this answer: {answer}")

@@ -32,6 +32,9 @@ cd smolagents/examples/open_deep_research
     pip install -e ../../.[dev]
     ```
 
+If you anticipate making many code changes you can avoid installing/reinstalling, by setting:
+```export PYTHONPATH=<smolagents_path>/smolagents/src/```
+
 ### Set up environment variables
 
 The agent uses the `GoogleSearchTool` for web search, which requires an environment variable with the corresponding API key, based on the selected provider:
@@ -48,7 +51,26 @@ For example, to use the default `o1` model, you need to set the `OPENAI_API_KEY`
 
 ## Usage
 
-Then you're good to go! Run the run.py script, as in:
+Run the run.py script, as in:
+
 ```bash
 python run.py --model-id "o1" "Your question here!"
 ```
+
+Use the `--model-id` parameter to specify the model you want to use.  For OpenAI models, you can use model IDs like "o1".
+
+To use a different OpenAI-compatible API endpoint, also specify the `--api-base` parameter:
+
+```bash
+python run.py --model-id "YOUR_MODEL_NAME" --api-base "YOUR_API_BASE_URL" "Your question here!"
+```
+
+Replace `"YOUR_API_BASE_URL"` with the base URL of your API endpoint, and `"YOUR_MODEL_NAME"` with the name of the model you want to use with that endpoint.
+
+### Using a different search provider
+
+You can choose between the "serper" (default) and "serpapi" search providers using the `--search-provider` argument. Make sure to set the corresponding environment variable (`SERPER_API_KEY` or `SERPAPI_API_KEY`) accordingly.
+
+```bash
+python run.py --search-provider "serper" "Your question here!"  # Uses SERPER_API_KEY (default)
+python run.py --search-provider "serpapi" "Your question here!" # Uses SERPAPI_API_KEY

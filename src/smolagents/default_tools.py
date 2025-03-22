@@ -14,6 +14,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+import logging
 from dataclasses import dataclass
 from typing import Any, Dict, Optional
 
@@ -23,7 +24,8 @@ from .local_python_executor import (
     evaluate_python_code,
 )
 from .tools import PipelineTool, Tool
-
+logging.basicConfig(level=logging.INFO)    
+logger = logging.getLogger(__name__)
 
 @dataclass
 class PreTool:
@@ -147,6 +149,8 @@ class GoogleSearchTool(Tool):
         else:
             self.organic_key = "organic"
             api_key_env_name = "SERPER_API_KEY"
+            
+        logger.info(f"Using {provider} as search provider.")        
         self.api_key = os.getenv(api_key_env_name)
         if self.api_key is None:
             raise ValueError(f"Missing API key. Make sure you have '{api_key_env_name}' in your env variables.")
